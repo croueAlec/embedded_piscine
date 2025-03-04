@@ -1,4 +1,5 @@
 #include <avr/io.h>
+#include <stdint.h>
 #include <util/delay.h>
 
 void	update_leds(unsigned char count)
@@ -12,6 +13,14 @@ void	update_leds(unsigned char count)
 	PORTB |= count;	/* And we apply the rest of count to match their LEDs */
 }
 
+void	anti_bounce(volatile uint8_t pin)
+{
+	while (!(PIND & (1 << pin))) {
+		;
+	}
+	_delay_ms(1000);
+}
+
 int	main(void)
 {
 	unsigned char count = 0;
@@ -21,11 +30,11 @@ int	main(void)
 		if (!(PIND & (1 << PIND2)) && count < 15) {
 			count++;
 			update_leds(count);
-			_delay_ms(100000);
+			anti_bounce(PIND2);
 		} else if (!(PIND & (1 << PIND4)) && count > 0) {
 			count--;
 			update_leds(count);
-			_delay_ms(100000);
+			anti_bounce(PIND4);
 		}
 	}
 }
