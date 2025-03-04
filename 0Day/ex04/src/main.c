@@ -5,8 +5,10 @@ void	update_leds(unsigned char count)
 {
 	PORTB = 0;
 	if (count & 0b1000)	/* If the 4th bit of count is one we toggle the PORTB4 LED */
+	{
 		PORTB |= (1 << PORTB4);
-	count ^= 0b1000;	/* Then we set the 4th bit of count to 0 */
+		count ^= 0b1000;	/* Then we set the 4th bit of count to 0 */
+	}
 	PORTB |= count;	/* And we apply the rest of count to match their LEDs */
 }
 
