@@ -4,6 +4,7 @@ int	main(void)
 {
 	DDRB |= (1 << PORTB1);
 
+	/* page 140 - 16-2 we now set it to clear on match*/
 	TCCR1A |= (1 << COM1A1); /* output is OC1A */
 	TCCR1B |= ((1 << CS12)); /* scale of 256 */
 
