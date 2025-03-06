@@ -48,7 +48,7 @@ int	main(void)
 {
 	uart_init();
 
-	TCCR1B |= (1 << WGM12); /* Timer1 CTC mode */
+	TCCR1B |= (1 << WGM12); /* Timer1 CTC mode (reset when reaching TOP) */
 
 	/* page 145 - 16.11.8 */
 	TIMSK1 |= (1 << OCIE1A ); /* Enable interrupt when OCF1A bit is set upon Timer Compare Match */
