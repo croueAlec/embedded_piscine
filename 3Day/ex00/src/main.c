@@ -15,23 +15,9 @@ void	next_color(void)
 	}
 }
 
-// ISR(TIMER1_COMPA_vect) /* Behavior of Timer1 interrupt */
-// {
-// 	next_color();
-// }
-
 int	main(void)
 {
 	DDRD |= (1 << DDD3) | (1 << DDD5) | (1 << DDD6);
-
-	// TCCR1B |= (1 << WGM12); /* Clear timer */
-
-	// TIMSK1 |= (1 << OCIE1A ); /* Timer interrupt */
-
-	// sei();
-
-	// OCR1A = 62499;	/* 1 second on */
-	// TCCR1B |= (1 << CS12); /* 256 scaler */
 
 	while (1) {
 		next_color();
