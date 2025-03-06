@@ -23,3 +23,6 @@ flash: hex
 
 clean:
 	rm -rf $(BUILD_DIR)
+
+screen: all
+	screen $(PORT) $(BAUDRATE)
