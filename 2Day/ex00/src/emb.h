@@ -8,4 +8,5 @@
 #define UART_BAUDRATE 115200
 #endif
 
-#define UBRRN F_CPU / (8 * UART_BAUDRATE) - 1
+/* page 182 - 20-1 Baud Rate for double speed mode (page 182 - 20.3.2) */
+#define UBRRN ((F_CPU / (8 * UART_BAUDRATE)) - 1)
