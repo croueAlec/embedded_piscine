@@ -1,0 +1,40 @@
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avr/interrupt.h>
+
+void	next_color(void)
+{
+	if (PORTD & (1 << PORTD5)){
+		PORTD = (1 << PORTD6);
+	} else if (PORTD & (1 << PORTD6)) {
+		PORTD = (1 << PORTD3);
+	} else if (PORTD & (1 << PORTD3)) {
+		PORTD = (1 << PORTD5);
+	} else {
+		PORTD = (1 << PIND5);
+	}
+}
+
+// ISR(TIMER1_COMPA_vect) /* Behavior of Timer1 interrupt */
+// {
+// 	next_color();
+// }
+
+int	main(void)
+{
+	DDRD |= (1 << DDD3) | (1 << DDD5) | (1 << DDD6);
+
+	// TCCR1B |= (1 << WGM12); /* Clear timer */
+
+	// TIMSK1 |= (1 << OCIE1A ); /* Timer interrupt */
+
+	// sei();
+
+	// OCR1A = 62499;	/* 1 second on */
+	// TCCR1B |= (1 << CS12); /* 256 scaler */
+
+	while (1) {
+		next_color();
+		_delay_ms(1000);
+	}
+}
