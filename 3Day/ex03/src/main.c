@@ -3,12 +3,17 @@
 #include <stdatomic.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#include <stdbool.h>
 #include "emb.h"
 
 char	hex[8] = {0};
 char	tmp[8] = {0};
+
+char	*error = "Bad color format\n";
+char	*success = "Color displayed\n";
 
 void init_rgb()
 {
@@ -58,35 +63,6 @@ void	uart_tx(char c)
 	UDR0 = c; /* Set data in buffer */
 }
 
-void	check_hex(void)
-{
-	atomic_bool	flag = 0;
-
-	PORTB = (1 << PORTB0);
-	for (uint8_t i = 0; i < 8; i++) {
-		if (i == 0 && hex[i] != '#')
-			flag = 1;
-
-		if (i > 0 && i < 7 && !isxdigit(hex[i]))
-			flag = 1;
-		else if (i > 0 && i < 7)
-			tmp[i - 1] = hex[i];
-
-		if (i == 7 && hex[i] != '\r')
-			flag = 1;
-		hex[i] = '\0';
-	}
-
-	if (flag) {
-		for (uint8_t i = 0; i < 8; i++)
-			uart_tx(' ');
-		uart_tx('\n');
-		PORTB = (1 << PORTB1);
-	}
-	else
-		PORTB = (1 << PORTB4);
-}
-
 uint8_t	convert_to_dec(char *str)
 {
 	uint8_t value = strtol(str, NULL, 16);
@@ -96,15 +72,43 @@ uint8_t	convert_to_dec(char *str)
 
 void	hex_to_rgb(void)
 {
-	check_hex();
+	uint8_t b = convert_to_dec(&hex[5]);
+	uint8_t g = convert_to_dec(&hex[3]);
+	uint8_t r = convert_to_dec(&hex[1]);
 
-	uint8_t b = convert_to_dec(&tmp[4]);
-	uint8_t g = convert_to_dec(&tmp[2]);
-	uint8_t r = convert_to_dec(&tmp[0]);
+	set_rgb(r, g, b);
 
-	OCR0B = r;
-	OCR0A = g;
-	OCR2B = b;
+	uart_tx('\n');
+	for (uint8_t i = 0; success[i]; i++)
+		uart_tx(success[i]);
+	uart_tx('\r');
+}
+
+bool check_char(char c, uint8_t i) /* check color format */
+{
+	if (i == 0 && c != '#') {
+		return 0;
+	}
+	if (i > 0 && i < 7) {
+		if (!isxdigit(c))
+			return 0;
+	}
+	if (i == 7 && c != '\r')
+		return 0;
+
+	return 1;
+}
+
+void	handle_error(void)
+{
+	memset(hex, 0, 8);
+
+	uart_tx('\n');
+	uart_tx('\r');
+	for (uint8_t i = 0; error[i]; i++)
+		uart_tx(error[i]);
+	uart_tx('\r');
+
 }
 
 ISR(USART_RX_vect) /* Behavior of USART Receive */
@@ -116,6 +120,11 @@ ISR(USART_RX_vect) /* Behavior of USART Receive */
 	for (; hex[i] && i < 8; i++) {
 		;
 	}
+	if (!check_char(c, i)) {
+		handle_error();
+		return;
+	}
+
 	if (i == 7) {
 		hex[i] = c;
 		hex_to_rgb();
@@ -131,7 +140,7 @@ int	main(void)
 
 	UCSR0B |= (1 << RXCIE0); /* Enable receive interrupt */
 
-	sei();
+	sei(); /* enable global interrupts */
 
 	while (1) {
 		;

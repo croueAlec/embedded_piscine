@@ -25,5 +25,4 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 screen: all
-	sleep 3
 	screen $(PORT) $(BAUDRATE)
