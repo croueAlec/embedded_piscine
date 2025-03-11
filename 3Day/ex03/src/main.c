@@ -90,7 +90,7 @@ void	check_hex(void)
 uint8_t	convert_to_dec(char *str)
 {
 	uint8_t value = strtol(str, NULL, 16);
-	str[0] = '0';
+	str[0] = 0;
 	return value;
 }
 
@@ -98,9 +98,9 @@ void	hex_to_rgb(void)
 {
 	check_hex();
 
-	uint8_t b = convert_to_dec(&hex[4]);
-	uint8_t g = convert_to_dec(&hex[2]);
-	uint8_t r = convert_to_dec(&hex[0]);
+	uint8_t b = convert_to_dec(&tmp[4]);
+	uint8_t g = convert_to_dec(&tmp[2]);
+	uint8_t r = convert_to_dec(&tmp[0]);
 
 	OCR0B = r;
 	OCR0A = g;
